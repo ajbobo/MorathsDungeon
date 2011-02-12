@@ -1,4 +1,4 @@
-package ajbobo.morathdungeon;
+package ajbobo.morathsdungeon;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,8 +7,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class Morath_Dungeon extends Activity
+public class Moraths_Dungeon extends Activity
 {
+	private Maze _maze;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -21,6 +23,8 @@ public class Morath_Dungeon extends Activity
 		{
 			public void onClick(View v)
 			{
+				_maze = new Maze(15,10);//30,30);
+				String temp = _maze.GetMazeString();
 				ShowToast("Coming Soon...");
 			}
 		});
