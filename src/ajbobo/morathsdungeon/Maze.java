@@ -7,11 +7,11 @@ public class Maze
 	private final MazeSpace WALL_SPACE = new MazeSpace();
 
 	private MazeSpace[][] _maze;
-
 	private Random rand = new Random();
 
 	public Maze(int width, int height)
 	{
+		// Create the maze, add the borders
 		_maze = new MazeSpace[width][height];
 		for (int x = 0; x < width; x++)
 		{
@@ -24,19 +24,25 @@ public class Maze
 			}
 		}
 
+		// Start filling in the maze
 		TravelTo(1, 1);
 	}
 	
-	private MazeSpace AssignSpace(int x, int y)
+	private boolean AssignSpace(int x, int y)
 	{
-		if (_maze[x][y] != null)
-			return _maze[x][y]; // Don't reassign the space
+		MazeSpace curspace = _maze[x][y];
+		if (curspace == WALL_SPACE)
+			return false;
+		else if (curspace != null) // The space is assigned a hall
+			return true;
 	
-		
 		if (rand.nextInt(4) == 0) // 25% chance of a wall
+		{
 			_maze[x][y] = WALL_SPACE;
+			return false;
+		}	
 
-		return _maze[x][y]; // Returning a null means that the space is valid, but not yet traveled
+		return true; // If we get here, then the space will be a hall
 	}
 	
 	private void TravelTo(int x, int y)
@@ -49,10 +55,10 @@ public class Maze
 		_maze[x][y] = new MazeSpace();
 		
 		// Decide which of the four orthagonal spaces are halls and which are walls
-		boolean havenorth = (AssignSpace(x,y + 1) != WALL_SPACE); // North
-		boolean havesouth = (AssignSpace(x,y - 1) != WALL_SPACE); // South
-		boolean haveeast = (AssignSpace(x + 1,y) != WALL_SPACE); // East
-		boolean havewest = (AssignSpace(x - 1,y) != WALL_SPACE); // West
+		boolean havenorth = AssignSpace(x,y + 1); // North
+		boolean havesouth = AssignSpace(x,y - 1); // South
+		boolean haveeast = AssignSpace(x + 1,y); // East
+		boolean havewest = AssignSpace(x - 1,y); // West
 		
 		// Create diagonal walls appropriately
 		if (havenorth && haveeast) _maze[x + 1][y + 1] = WALL_SPACE;
@@ -60,8 +66,7 @@ public class Maze
 		if (havesouth && haveeast) _maze[x + 1][y - 1] = WALL_SPACE;
 		if (havesouth && havewest) _maze[x - 1][y - 1] = WALL_SPACE;
 
-		
-		String temp = GetMazeString();
+		//String temp = GetMazeString();
 		
 		// Travel to the orthagonal spaces and expand the maze from there
 		TravelTo(x,y + 1); // North
