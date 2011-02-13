@@ -1,6 +1,7 @@
 package ajbobo.morathsdungeon;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,9 +24,7 @@ public class Moraths_Dungeon extends Activity
 		{
 			public void onClick(View v)
 			{
-				_maze = new Maze(15,10);//30,30);
-				String temp = _maze.GetMazeString();
-				ShowToast("Coming Soon...");
+				StartGame();
 			}
 		});
 		
@@ -46,6 +45,16 @@ public class Moraths_Dungeon extends Activity
 				ShowToast("Coming Someday...");
 			}
 		});
+	}
+	
+	public void StartGame()
+	{
+		_maze = new Maze(15,10);//30,30);
+		//String temp = _maze.GetMazeString();
+		Intent intent = new Intent();
+		intent.setClass(this, MapView.class);
+		intent.putExtra("Maze",_maze);
+		startActivity(intent);
 	}
 	
 	public void ShowToast(String msg)

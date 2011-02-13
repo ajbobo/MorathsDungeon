@@ -2,7 +2,11 @@ package ajbobo.morathsdungeon;
 
 import java.util.Random;
 
-public class Maze
+import android.os.Binder;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Maze implements Parcelable
 {
 	private final MazeSpace WALL_SPACE = new MazeSpace();
 
@@ -28,6 +32,30 @@ public class Maze
 		TravelTo(1, 1);
 	}
 	
+	public Maze(Parcel parcel)
+	{
+		int width = parcel.readInt();
+		int height = parcel.readInt();
+		
+		_maze = new MazeSpace[width][height];
+		for (int x = 0; x < width; x++)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				int ishall = parcel.readInt();
+				if (ishall == 1)
+				{
+					_maze[x][y] = parcel.readParcelable(MazeSpace.class.getClassLoader());
+				}
+				else
+				{
+					_maze[x][y] = WALL_SPACE;
+				}
+			}
+		}
+		
+	}
+
 	private boolean AssignSpace(int x, int y)
 	{
 		MazeSpace curspace = _maze[x][y];
@@ -35,51 +63,55 @@ public class Maze
 			return false;
 		else if (curspace != null) // The space is assigned a hall
 			return true;
-	
+
 		if (rand.nextInt(4) == 0) // 25% chance of a wall
 		{
 			_maze[x][y] = WALL_SPACE;
 			return false;
-		}	
+		}
 
 		return true; // If we get here, then the space will be a hall
 	}
-	
+
 	private void TravelTo(int x, int y)
 	{
 		// Make sure the space hasn't been visited
 		if (_maze[x][y] != null)
 			return;
-		
+
 		// Mark the space as a valid hall
 		_maze[x][y] = new MazeSpace();
-		
-		// Decide which of the four orthagonal spaces are halls and which are walls
-		boolean havenorth = AssignSpace(x,y + 1); // North
-		boolean havesouth = AssignSpace(x,y - 1); // South
-		boolean haveeast = AssignSpace(x + 1,y); // East
-		boolean havewest = AssignSpace(x - 1,y); // West
-		
-		// Create diagonal walls appropriately
-		if (havenorth && haveeast) _maze[x + 1][y + 1] = WALL_SPACE;
-		if (havenorth && havewest) _maze[x - 1][y + 1] = WALL_SPACE;
-		if (havesouth && haveeast) _maze[x + 1][y - 1] = WALL_SPACE;
-		if (havesouth && havewest) _maze[x - 1][y - 1] = WALL_SPACE;
 
-		//String temp = GetMazeString();
-		
+		// Decide which of the four orthagonal spaces are halls and which are walls
+		boolean havenorth = AssignSpace(x, y + 1); // North
+		boolean havesouth = AssignSpace(x, y - 1); // South
+		boolean haveeast = AssignSpace(x + 1, y); // East
+		boolean havewest = AssignSpace(x - 1, y); // West
+
+		// Create diagonal walls appropriately
+		if (havenorth && haveeast)
+			_maze[x + 1][y + 1] = WALL_SPACE;
+		if (havenorth && havewest)
+			_maze[x - 1][y + 1] = WALL_SPACE;
+		if (havesouth && haveeast)
+			_maze[x + 1][y - 1] = WALL_SPACE;
+		if (havesouth && havewest)
+			_maze[x - 1][y - 1] = WALL_SPACE;
+
+		// String temp = GetMazeString();
+
 		// Travel to the orthagonal spaces and expand the maze from there
-		TravelTo(x,y + 1); // North
-		TravelTo(x,y - 1); // South
-		TravelTo(x + 1,y); // East
-		TravelTo(x - 1,y); // West
+		TravelTo(x, y + 1); // North
+		TravelTo(x, y - 1); // South
+		TravelTo(x + 1, y); // East
+		TravelTo(x - 1, y); // West
 	}
 
 	public String GetMazeString()
 	{
 		StringBuilder builder = new StringBuilder();
 
-		for (int y = _maze[0].length - 1; y >= 0 ; y--)
+		for (int y = _maze[0].length - 1; y >= 0; y--)
 		{
 			for (int x = 0; x < _maze.length; x++)
 			{
@@ -95,15 +127,47 @@ public class Maze
 		return builder.toString();
 	}
 
-	private class MazeSpace
+	public int describeContents() // Requred by Parcelable
 	{
-		int[] textures;
+		return 0;
+	}
 
-		public MazeSpace()
+	public void writeToParcel(Parcel dest, int flags) // Requred by Parcelable
+	{
+		int width = _maze.length;
+		int height = _maze[0].length;
+		
+		dest.writeInt(width);
+		dest.writeInt(height);
+		
+		for (int x = 0; x < width; x++)
 		{
-			textures = new int[4];
-			for (int x = 0; x < 4; x++)
-				textures[x] = 0;
+			for (int y = 0; y < height; y++)
+			{
+				MazeSpace curspace = _maze[x][y];
+				if (curspace == WALL_SPACE)
+				{
+					dest.writeInt(0);
+				}
+				else
+				{
+					dest.writeInt(1);
+					dest.writeParcelable(curspace, 0);
+				}
+			}
 		}
 	}
+
+	public static final Parcelable.Creator<Maze> CREATOR = new Parcelable.Creator<Maze>() // Requred by Parcelable
+	{
+		public Maze createFromParcel(Parcel in)
+		{
+			return new Maze(in);
+		}
+
+		public Maze[] newArray(int size)
+		{
+			return new Maze[size];
+		}
+	};
 }
