@@ -8,7 +8,7 @@ import android.os.Parcelable;
 
 public class Maze implements Parcelable
 {
-	private final MazeSpace WALL_SPACE = new MazeSpace();
+	public static final MazeSpace WALL_SPACE = new MazeSpace();
 
 	private MazeSpace[][] _maze;
 	private Random rand = new Random();
@@ -106,8 +106,26 @@ public class Maze implements Parcelable
 		TravelTo(x + 1, y); // East
 		TravelTo(x - 1, y); // West
 	}
+	
+	public int getHeight()
+	{
+		return _maze[0].length;
+	}
+	
+	public int getWidth()
+	{
+		return _maze.length;
+	}
+	
+	public MazeSpace getMazeSpace(int x, int y)
+	{
+		if (x < 0 || x >= _maze.length || y < 0 || y >= _maze[0].length)
+			return null;
+		
+		return _maze[x][y];
+	}
 
-	public String GetMazeString()
+	public String getMazeString()
 	{
 		StringBuilder builder = new StringBuilder();
 

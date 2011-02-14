@@ -49,7 +49,7 @@ public class Moraths_Dungeon extends Activity
 	
 	public void StartGame()
 	{
-		_maze = new Maze(15,10);//30,30);
+		_maze = new Maze(20,30);
 		//String temp = _maze.GetMazeString();
 		Intent intent = new Intent();
 		intent.setClass(this, MapView.class);
