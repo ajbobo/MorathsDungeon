@@ -149,7 +149,7 @@ public class Game3DView extends Activity
 
 			public void onSurfaceChanged(GL10 gl, int width, int height)
 			{
-				 Set the viewport to the entire screen (or at least the part allocated for the program)
+				// Set the viewport to the entire screen (or at least the part allocated for the program)
 				gl.glViewport(0, 0, width, height);
 
 				// Set the frustum so that squares are actually square on the screen
