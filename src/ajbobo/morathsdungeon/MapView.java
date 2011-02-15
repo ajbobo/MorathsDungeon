@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class MapView extends Activity
 {
@@ -23,6 +25,11 @@ public class MapView extends Activity
 		Maze maze = intent.getParcelableExtra("Maze");
 		
 		viewer = new MapViewer(this, maze);
+		
+		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+       
 		setContentView(viewer);
 	}
 	
@@ -42,7 +49,8 @@ public class MapView extends Activity
 		
 		public void onDraw(Canvas canvas)
 		{
-			int border = 5;
+			// Calculate the size and location of the maze on the screen
+			int border = 0; // This is here in case I decide to use it again in the future
 			
 			int canvaswidth = canvas.getWidth() - (2 * border);
 			int canvasheight = canvas.getHeight() - (2 * border);
@@ -58,9 +66,7 @@ public class MapView extends Activity
 			int left = (int)(centerx - cellsize * ((float)mazewidth / 2));
 			int top = (int)(centery - cellsize * ((float)mazeheight / 2));
 			
-			paint.setColor(Color.CYAN);
-			canvas.drawRect(left - 2, top - 2, left + mazewidth * cellsize + 2, top + mazeheight * cellsize + 2, paint);
-			
+			// Color the maze
 			for (int x = 0; x < mazewidth; x++)
 			{
 				for (int y = 0; y < mazeheight; y++)
@@ -68,8 +74,8 @@ public class MapView extends Activity
 					MazeSpace curspace = _maze.getMazeSpace(x, y);
 					if (curspace == null)
 						continue;
-					else if (curspace == Maze.WALL_SPACE)
-						paint.setColor(Color.DKGRAY);
+					else if (curspace == Maze.WALL_SPACE) // Don't draw walls
+						continue;
 					else if (x == 1 && y == 1)
 						paint.setColor(Color.BLUE);
 					else
@@ -80,11 +86,6 @@ public class MapView extends Activity
 					canvas.drawRect(spacex, spacey, spacex + cellsize, spacey + cellsize, paint);
 				}
 			}
-			
-			paint.setColor(Color.BLUE);
-			canvas.drawCircle(centerx, centery, 1, paint);
-			
-			
 		}
 		
 	}

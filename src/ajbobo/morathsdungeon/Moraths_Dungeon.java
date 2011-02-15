@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
@@ -17,6 +19,11 @@ public class Moraths_Dungeon extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		
 		setContentView(R.layout.main);
 		
 		Button button = (Button) findViewById(R.id.btnNewGame);
@@ -49,8 +56,8 @@ public class Moraths_Dungeon extends Activity
 	
 	public void StartGame()
 	{
-		_maze = new Maze(20,30);
-		//String temp = _maze.GetMazeString();
+		_maze = new Maze(30,30);
+
 		Intent intent = new Intent();
 		intent.setClass(this, MapView.class);
 		intent.putExtra("Maze",_maze);
