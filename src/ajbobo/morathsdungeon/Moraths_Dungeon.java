@@ -59,7 +59,7 @@ public class Moraths_Dungeon extends Activity
 		_maze = new Maze(30,30);
 
 		Intent intent = new Intent();
-		intent.setClass(this, MapView.class);
+		intent.setClass(this, Game3DView.class);
 		intent.putExtra("Maze",_maze);
 		startActivity(intent);
 	}
