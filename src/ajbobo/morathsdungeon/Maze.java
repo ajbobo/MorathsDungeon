@@ -2,7 +2,6 @@ package ajbobo.morathsdungeon;
 
 import java.util.Random;
 
-import android.os.Binder;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -22,7 +21,7 @@ public class Maze implements Parcelable
 			for (int y = 0; y < height; y++)
 			{
 				if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
-					_maze[x][y] = WALL_SPACE; // Start with a border of walls-
+					_maze[x][y] = WALL_SPACE; // Start with a border of walls
 				else
 					_maze[x][y] = null; // null = a space that hasn't been assigned
 			}
