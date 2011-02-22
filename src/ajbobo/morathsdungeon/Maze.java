@@ -123,6 +123,16 @@ public class Maze implements Parcelable
 		
 		return _maze[x][y];
 	}
+	
+	public boolean isHallSpace(int x, int y)
+	{
+		MazeSpace curspace = getMazeSpace(x,y);
+		
+		if (curspace == null || curspace == WALL_SPACE)
+			return false;
+		
+		return true;
+	}
 
 	public String getMazeString()
 	{
