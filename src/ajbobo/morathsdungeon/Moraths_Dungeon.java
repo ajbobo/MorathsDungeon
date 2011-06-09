@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 public class Moraths_Dungeon extends Activity
 {
-	private Maze _maze;
+	//private Maze _maze;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -56,11 +56,11 @@ public class Moraths_Dungeon extends Activity
 	
 	public void StartGame()
 	{
-		_maze = new Maze(3,3);
+		Maze maze = new Maze(25,25); // Do not include the outer walls in the dimensions
 
 		Intent intent = new Intent();
 		intent.setClass(this, Game3DView.class);
-		intent.putExtra("Maze",_maze);
+		intent.putExtra("Maze",maze);
 		startActivity(intent);
 	}
 	

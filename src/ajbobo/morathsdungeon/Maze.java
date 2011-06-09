@@ -14,6 +14,9 @@ public class Maze implements Parcelable
 
 	public Maze(int width, int height)
 	{
+		// Adjust the width to account for borders
+		width += 2;
+		height += 2;
 		// Create the maze, add the borders
 		_maze = new MazeSpace[width][height];
 		for (int x = 0; x < width; x++)

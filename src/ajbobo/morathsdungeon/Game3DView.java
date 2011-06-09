@@ -1,11 +1,5 @@
 package ajbobo.morathsdungeon;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -20,7 +14,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 public class Game3DView extends Activity
 {
@@ -90,14 +83,14 @@ public class Game3DView extends Activity
 
 	private class GLViewer extends GLSurfaceView
 	{
-		private MazeRenderer renderer;
+		private GameRenderer renderer;
 		private float lastX, lastY;
 
 		public GLViewer(Context context, Maze inmaze)
 		{
 			super(context);
 
-			renderer = new MazeRenderer(inmaze);
+			renderer = new GameRenderer(inmaze, context, this);
 			setRenderer(renderer);
 			setRenderMode(RENDERMODE_WHEN_DIRTY);
 		}
@@ -125,34 +118,28 @@ public class Game3DView extends Activity
 			return true;
 		}
 
-		private class MazeRenderer implements GLSurfaceView.Renderer
+		private class GameRenderer implements GLSurfaceView.Renderer
 		{
-			private Maze _maze;
+			private Context _context;
+			private GLViewer _view;
 			
 			public float angle;
-
-			private FloatBuffer vertexbuffer, colorbuffer;
-			private ShortBuffer indexbuffer;
-			private int vertexcnt;
 			
-			private float colors[] = { 
-					1, 0, 0, 1, // red
-					0, 1, 0, 1, // green
-					0, 0, 1, 1, // blue
-					1, 0, 1, 1, // purple
-					1, 1, 0, 1, // yellow
-					0, 1, 1, 1, // cyan
-					1, 1, 1, 1, // white
-					0, 0, 0, 1, // black
-				};
+			private Maze _maze;
+			public Axis _axis;
 
-			public MazeRenderer(Maze inmaze)
+		
+			public GameRenderer(Maze inmaze, Context context, GLViewer view)
 			{
+				_context = context;
+				_view = view;
 				angle = 0;
+				
 				_maze = inmaze;
-				int mazewidth = _maze.getWidth();
-				int mazeheight = _maze.getHeight();
-
+				_axis = new Axis();
+				
+				
+/* NOTE: Make the Maze class a Drawable3D object and move this stuff into it
 				// Create the array to hold the vertex information
 				int valsperlevel = (mazewidth - 1) * (mazeheight - 1) * 3;
 				vertexcnt = valsperlevel * 2;
@@ -170,10 +157,10 @@ public class Game3DView extends Activity
 					for (int x = 0; x < mazewidth - 1; x++)
 					{
 						int altptr = ptr + valsperlevel;
-						vertices[ptr] = vertices[altptr] = 1 * x; // X and X'
-						vertices[ptr + 1] = 0; // Y
-						vertices[altptr + 1] = 1; // Y'
-						vertices[ptr + 2] = vertices[altptr + 2] = -1 * y; // Z and Z'
+						vertices[ptr] = vertices[altptr] = 5 * x - 5; // X and X'
+						vertices[ptr + 1] = -5; // Y
+						vertices[altptr + 1] = 5; // Y'
+						vertices[ptr + 2] = vertices[altptr + 2] = -5 * y - 5; // Z and Z'
 
 						ptr += 3;
 					}
@@ -220,9 +207,10 @@ public class Game3DView extends Activity
 				}
 				indexbuffer.position(0);
 				colorbuffer.position(0);
+				*/
 			}
 
-			private void addWall(short index1, short index2, int offset)
+			/*private void addWall(short index1, short index2, int offset)
 			{
 				int cnt;
 				try
@@ -240,49 +228,51 @@ public class Game3DView extends Activity
 					String temp = _maze.getMazeString();
 					Toast.makeText(null, ex.getMessage(), Toast.LENGTH_SHORT).show();
 				}
-			}
-
+			}*/
+			
 			public void onDrawFrame(GL10 gl)
 			{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-				gl.glMatrixMode(GL10.GL_MODELVIEW);
-				gl.glLoadIdentity();
+				gl.glPushMatrix();
 
 				// Position the camera
-				gl.glTranslatef(-.5f, -.5f, -1f);
 				gl.glRotatef(angle, 0, 1, 0);
 				
-				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-
-				// Draw the Maze
-				gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexbuffer);
-				gl.glColorPointer(4, GL10.GL_FLOAT, 0, colorbuffer);
-				gl.glDrawElements(GL10.GL_TRIANGLES, vertexcnt, GL10.GL_UNSIGNED_SHORT, indexbuffer);
+				_axis.draw(gl);
+				
+				gl.glPopMatrix();
 			}
 
 			public void onSurfaceChanged(GL10 gl, int width, int height)
 			{
 				// Set the viewport to the entire screen (or at least the part allocated for the program)
 				gl.glViewport(0, 0, width, height);
-
-				// Set the frustum so that squares are actually square on the screen
-				float ratio = (float) width / height;
-				gl.glMatrixMode(GL10.GL_PROJECTION);
-				gl.glLoadIdentity();
-				gl.glFrustumf(-ratio, ratio, -1, 1, .5f, 2.1f);
 			}
 
 			public void onSurfaceCreated(GL10 gl, EGLConfig config)
 			{
+				// Set the frustum so that squares are actually square on the screen
+				gl.glMatrixMode(GL10.GL_PROJECTION);
+				gl.glLoadIdentity();
+				
+				// the 90 degree field of view makes the Eye of Beholder mazey look
+				GLU.gluPerspective(gl, 90.0f, (_view.getWidth() * 1f) / _view.getHeight(), 1, 100);
+				
+				// After fighting with this command for a long time, I found these parameters that match up well
+				// with my AC3D workspace, and then I just control the view using 
+				// the scale, translate, and rotate in the draw code
+				GLU.gluLookAt(gl, 0f, 2f, -4f, 0.0f, 0.0f, 0f, 0.0f, 1.0f, 1.0f);
+				
 				// By default, OpenGL enables features that improve quality but reduce performance. One might want to tweak that especially on software renderer.
 				gl.glDisable(GL10.GL_DITHER);
+				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
 				// Some one-time OpenGL initialization can be made here probably based on features of this particular context
-				gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
+				//gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
 				gl.glClearColor(0, 0, .25f, 1);
-				gl.glEnable(GL10.GL_CULL_FACE);
+				//gl.glEnable(GL10.GL_CULL_FACE);
 				gl.glShadeModel(GL10.GL_SMOOTH);
 				gl.glEnable(GL10.GL_DEPTH_TEST);
 			}
