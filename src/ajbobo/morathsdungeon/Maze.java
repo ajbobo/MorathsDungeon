@@ -17,17 +17,6 @@ public class Maze extends Drawable3D implements Parcelable
 	private MazeSpace[][] _maze;
 	private Random rand = new Random();
 	
-	float colors[] = { 
-			1, 0, 0, 1, // red
-			0, 1, 0, 1, // green
-			0, 0, 1, 1, // blue
-			1, 0, 1, 1, // purple
-			1, 1, 0, 1, // yellow
-			0, 1, 1, 1, // cyan
-			1, 1, 1, 1, // white
-			0, 0, 0, 1, // black 
-		};
-
 	public Maze(int width, int height)
 	{
 		// Adjust the width to account for borders
@@ -130,6 +119,106 @@ public class Maze extends Drawable3D implements Parcelable
 		TravelTo(x - 1, y); // West
 	}
 	
+	
+	private void CalculateVertices()
+	{
+		int mazewidth = getWidth();
+		int mazeheight = getHeight();
+		float colors[] = { 
+				1, 0, 0, 1, // red
+				0, 1, 0, 1, // green
+				0, 0, 1, 1, // blue
+				1, 0, 1, 1, // purple
+				1, 1, 0, 1, // yellow
+				0, 1, 1, 1, // cyan
+				1, 1, 1, 1, // white
+				0, 0, 0, 1, // black 
+			};
+		
+		fillColorBuffer(colors);
+
+		// Create the array to hold the vertex information
+		int valsperlevel = (mazewidth - 1) * (mazeheight - 1) * 3;
+		vertexcnt = valsperlevel * 2;
+		float vertices[] = new float[vertexcnt];
+		int ptr = 0;
+		for (int y = 0; y < mazeheight - 1; y++)
+		{
+			for (int x = 0; x < mazewidth - 1; x++)
+			{
+				int altptr = ptr + valsperlevel;
+				vertices[ptr] = vertices[altptr] = -5 + (10 * x); // X and X'
+				vertices[ptr + 1] = -5; // Y
+				vertices[altptr + 1] = 5; // Y'
+				vertices[ptr + 2] = vertices[altptr + 2] = 5 - (10 * y); // Z and Z'
+	
+				ptr += 3;
+			}
+		}
+		fillVertexBuffer(vertices);
+	
+		// Create the array to hold the index information
+		int m = mazewidth - 2;
+		int n = mazeheight - 2;
+		int maxvertices = 2 * ((2 * m * n) + m + n) * 3;
+		ByteBuffer vbb = ByteBuffer.allocateDirect(maxvertices * 4);
+		vbb.order(ByteOrder.nativeOrder());
+		indexbuffer = vbb.asShortBuffer(); //IntBuffer.allocate(maxvertices * 4); // 4 = size of int
+	
+		ptr = 0;
+		for (int y = 1; y <= n; y++)
+		{
+			for (int x = 1; x <= m; x++)
+			{
+				if (!isHallSpace(x, y))
+					continue;
+				
+				short space = (short)((y - 1) * m + x);
+				short a = (short)(space + (y - 1) - 1);
+				short b = (short)(a + 1);
+				short c = (short)(b + m);
+				short d = (short)(c + 1);
+	
+				if (!isHallSpace(x, y + 1))
+					addWall(c, d, valsperlevel / 3); // North
+				if (!isHallSpace(x, y - 1))
+					addWall(b, a, valsperlevel / 3); // South
+				if (!isHallSpace(x + 1, y))
+					addWall(d, b, valsperlevel / 3); // East
+				if (!isHallSpace(x - 1, y))
+					addWall(a, c, valsperlevel / 3); // West
+	
+			}
+		}
+		indexbuffer.position(0);
+	}
+
+	private void addWall(short index1, short index2, int offset)
+	{
+		try
+		{
+			indexbuffer.put(index1);
+			indexbuffer.put(index2);
+			indexbuffer.put((short)(index1 + offset));
+	
+			indexbuffer.put(index2);
+			indexbuffer.put((short)(index2 + offset));
+			indexbuffer.put((short)(index1 + offset));
+		}
+		catch (Exception ex)
+		{
+			//String temp = getMazeString();
+			Toast.makeText(null, ex.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	public void draw(GL10 gl)
+	{
+		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexbuffer);
+		gl.glColorPointer(4, GL10.GL_FLOAT, 0, colorbuffer);
+		gl.glDrawElements(GL10.GL_TRIANGLES, vertexcnt, GL10.GL_UNSIGNED_SHORT, indexbuffer);
+	}
+	
 	public int getHeight()
 	{
 		return _maze[0].length;
@@ -221,94 +310,4 @@ public class Maze extends Drawable3D implements Parcelable
 			return new Maze[size];
 		}
 	};
-	
-	private void CalculateVertices()
-	{
-		int mazewidth = getWidth();
-		int mazeheight = getHeight();
-		
-		fillColorBuffer(colors);
-
-		// Create the array to hold the vertex information
-		int valsperlevel = (mazewidth - 1) * (mazeheight - 1) * 3;
-		vertexcnt = valsperlevel * 2;
-		float vertices[] = new float[vertexcnt];
-		int ptr = 0;
-		for (int y = 0; y < mazeheight - 1; y++)
-		{
-			for (int x = 0; x < mazewidth - 1; x++)
-			{
-				int altptr = ptr + valsperlevel;
-				vertices[ptr] = vertices[altptr] = -5 + (10 * x); // X and X'
-				vertices[ptr + 1] = -5; // Y
-				vertices[altptr + 1] = 5; // Y'
-				vertices[ptr + 2] = vertices[altptr + 2] = 5 - (10 * y); // Z and Z'
-	
-				ptr += 3;
-			}
-		}
-		fillVertexBuffer(vertices);
-	
-		// Create the array to hold the index information
-		int m = mazewidth - 2;
-		int n = mazeheight - 2;
-		int maxvertices = 2 * ((2 * m * n) + m + n) * 3;
-		ByteBuffer vbb = ByteBuffer.allocateDirect(maxvertices * 4);
-		vbb.order(ByteOrder.nativeOrder());
-		indexbuffer = vbb.asShortBuffer(); //IntBuffer.allocate(maxvertices * 4); // 4 = size of int
-	
-		ptr = 0;
-		for (int y = 1; y <= n; y++)
-		{
-			for (int x = 1; x <= m; x++)
-			{
-				if (!isHallSpace(x, y))
-					continue;
-				
-				short space = (short)((y - 1) * m + x);
-				short a = (short)(space + (y - 1) - 1);
-				short b = (short)(a + 1);
-				short c = (short)(b + m);
-				short d = (short)(c + 1);
-	
-				if (!isHallSpace(x, y + 1))
-					addWall(c, d, valsperlevel / 3); // North
-				if (!isHallSpace(x, y - 1))
-					addWall(b, a, valsperlevel / 3); // South
-				if (!isHallSpace(x + 1, y))
-					addWall(d, b, valsperlevel / 3); // East
-				if (!isHallSpace(x - 1, y))
-					addWall(a, c, valsperlevel / 3); // West
-	
-			}
-		}
-		indexbuffer.position(0);
-		colorbuffer.position(0);
-	}
-
-	private void addWall(short index1, short index2, int offset)
-	{
-		try
-		{
-			indexbuffer.put(index1);
-			indexbuffer.put(index2);
-			indexbuffer.put((short)(index1 + offset));
-	
-			indexbuffer.put(index2);
-			indexbuffer.put((short)(index2 + offset));
-			indexbuffer.put((short)(index1 + offset));
-		}
-		catch (Exception ex)
-		{
-			//String temp = getMazeString();
-			Toast.makeText(null, ex.getMessage(), Toast.LENGTH_SHORT).show();
-		}
-	}
-	
-	public void draw(GL10 gl)
-	{
-		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexbuffer);
-		gl.glColorPointer(4, GL10.GL_FLOAT, 0, colorbuffer);
-		gl.glDrawElements(GL10.GL_TRIANGLES, vertexcnt, GL10.GL_UNSIGNED_SHORT, indexbuffer);
-	}
 }

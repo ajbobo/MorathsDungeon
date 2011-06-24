@@ -136,7 +136,7 @@ public class Game3DView extends Activity
 				angle = 180;
 				
 				_maze = inmaze;
-				_axis = new Axis();
+				//_axis = new Axis();
 			}
 			
 			public void onDrawFrame(GL10 gl)
