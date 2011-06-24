@@ -133,102 +133,11 @@ public class Game3DView extends Activity
 			{
 				_context = context;
 				_view = view;
-				angle = 0;
+				angle = 180;
 				
 				_maze = inmaze;
 				_axis = new Axis();
-				
-				
-/* NOTE: Make the Maze class a Drawable3D object and move this stuff into it
-				// Create the array to hold the vertex information
-				int valsperlevel = (mazewidth - 1) * (mazeheight - 1) * 3;
-				vertexcnt = valsperlevel * 2;
-				float vertices[] = new float[vertexcnt];
-
-				ByteBuffer vbb = ByteBuffer.allocateDirect(colors.length * 4);
-				vbb.order(ByteOrder.nativeOrder());
-				colorbuffer = vbb.asFloatBuffer();
-				colorbuffer.put(colors);
-				colorbuffer.position(0);
-				
-				int ptr = 0;
-				for (int y = 0; y < mazeheight - 1; y++)
-				{
-					for (int x = 0; x < mazewidth - 1; x++)
-					{
-						int altptr = ptr + valsperlevel;
-						vertices[ptr] = vertices[altptr] = 5 * x - 5; // X and X'
-						vertices[ptr + 1] = -5; // Y
-						vertices[altptr + 1] = 5; // Y'
-						vertices[ptr + 2] = vertices[altptr + 2] = -5 * y - 5; // Z and Z'
-
-						ptr += 3;
-					}
-				}
-				vbb = ByteBuffer.allocateDirect(vertices.length * 4); // 4 = size of float
-				vbb.order(ByteOrder.nativeOrder());
-				vertexbuffer = vbb.asFloatBuffer();
-				vertexbuffer.put(vertices);
-				vertexbuffer.position(0);
-
-				// Create the array to hold the index information
-				int m = mazewidth - 2;
-				int n = mazeheight - 2;
-				int maxvertices = 2 * ((2 * m * n) + m + n) * 3;
-				vbb = ByteBuffer.allocateDirect(maxvertices * 4);
-				vbb.order(ByteOrder.nativeOrder());
-				indexbuffer = vbb.asShortBuffer(); //IntBuffer.allocate(maxvertices * 4); // 4 = size of int
-				// indexbuffer.allocate(maxvertices); // This could be too big - it will be compacted later
-
-				ptr = 0;
-				for (int y = 1; y <= n; y++)
-				{
-					for (int x = 1; x <= m; x++)
-					{
-						if (!_maze.isHallSpace(x, y))
-							continue;
-						
-						short space = (short)((y - 1) * m + x);
-						short a = (short)(space + (y - 1) - 1);
-						short b = (short)(a + 1);
-						short c = (short)(b + m);
-						short d = (short)(c + 1);
-
-						if (!_maze.isHallSpace(x, y + 1))
-							addWall(c, d, valsperlevel / 3); // North
-						if (!_maze.isHallSpace(x, y - 1))
-							addWall(b, a, valsperlevel / 3); // South
-						if (!_maze.isHallSpace(x + 1, y))
-							addWall(d, b, valsperlevel / 3); // East
-						if (!_maze.isHallSpace(x - 1, y))
-							addWall(a, c, valsperlevel / 3); // West
-
-					}
-				}
-				indexbuffer.position(0);
-				colorbuffer.position(0);
-				*/
 			}
-
-			/*private void addWall(short index1, short index2, int offset)
-			{
-				int cnt;
-				try
-				{
-					indexbuffer.put(index1);
-					indexbuffer.put(index2);
-					indexbuffer.put((short)(index1 + offset));
-
-					indexbuffer.put(index2);
-					indexbuffer.put((short)(index2 + offset));
-					indexbuffer.put((short)(index1 + offset));
-				}
-				catch (Exception ex)
-				{
-					String temp = _maze.getMazeString();
-					Toast.makeText(null, ex.getMessage(), Toast.LENGTH_SHORT).show();
-				}
-			}*/
 			
 			public void onDrawFrame(GL10 gl)
 			{
@@ -239,7 +148,8 @@ public class Game3DView extends Activity
 				// Position the camera
 				gl.glRotatef(angle, 0, 1, 0);
 				
-				_axis.draw(gl);
+				//_axis.draw(gl);
+				_maze.draw(gl);
 				
 				gl.glPopMatrix();
 			}
@@ -262,7 +172,7 @@ public class Game3DView extends Activity
 				// After fighting with this command for a long time, I found these parameters that match up well
 				// with my AC3D workspace, and then I just control the view using 
 				// the scale, translate, and rotate in the draw code
-				GLU.gluLookAt(gl, 0f, 2f, -4f, 0.0f, 0.0f, 0f, 0.0f, 1.0f, 1.0f);
+				GLU.gluLookAt(gl, 0f, 0f, -4f, 0.0f, 0.0f, 0f, 0.0f, 1.0f, 0.0f);
 				
 				// By default, OpenGL enables features that improve quality but reduce performance. One might want to tweak that especially on software renderer.
 				gl.glDisable(GL10.GL_DITHER);

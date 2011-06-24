@@ -56,7 +56,7 @@ public class Moraths_Dungeon extends Activity
 	
 	public void StartGame()
 	{
-		Maze maze = new Maze(25,25); // Do not include the outer walls in the dimensions
+		Maze maze = new Maze(5,5); // Do not include the outer walls in the dimensions
 
 		Intent intent = new Intent();
 		intent.setClass(this, Game3DView.class);
