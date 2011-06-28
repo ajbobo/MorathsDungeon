@@ -31,6 +31,26 @@ public class GameRules implements Parcelable
 	{
 		return _player;
 	}
+
+	public void rotatePlayer(float angle)
+	{
+		_player.incrementRot(angle);
+		
+	}
+
+	public void movePlayer(float amount)
+	{
+		float rot = _player.getRot();
+		float a = (float) (amount * Math.sin(Math.toRadians(rot)));
+		float b = (float) (amount * Math.cos(Math.toRadians(rot)));
+		_player.moveLoc(-a, -b);
+	}
+
+	public void draw(GL10 gl)
+	{
+		_player.draw(gl);
+		_maze.draw(gl);	
+	}
 	
 	public int describeContents() // Requred by Parcelable
 	{
@@ -55,25 +75,4 @@ public class GameRules implements Parcelable
 			return new GameRules[size];
 		}
 	};
-
-	public void rotatePlayer(float angle)
-	{
-		_player.incrementRot(angle);
-		
-	}
-
-	public void movePlayer(float amount)
-	{
-		float rot = _player.getRot();
-		float a = (float) (amount * Math.sin(Math.toRadians(rot)));
-		float b = (float) (amount * Math.cos(Math.toRadians(rot)));
-		_player.moveLoc(-a, -b);
-	}
-
-	public void draw(GL10 gl)
-	{
-		_player.draw(gl);
-		_maze.draw(gl);
-		
-	}
 }
