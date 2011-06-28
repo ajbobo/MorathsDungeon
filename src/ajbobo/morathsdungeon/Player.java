@@ -4,7 +4,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class Player extends Character
 {
@@ -21,14 +20,6 @@ public class Player extends Character
 	public Player(Parcel parcel)
 	{
 		super(parcel);
-	}
-	
-	public void move(float amount)
-	{
-		float rot = getRot();
-		float a = (float) (amount * Math.sin(Math.toRadians(rot)));
-		float b = (float) (amount * Math.cos(Math.toRadians(rot)));
-		setLoc(getX() - a, getY() - b);
 	}
 	
 	public void draw(GL10 gl)

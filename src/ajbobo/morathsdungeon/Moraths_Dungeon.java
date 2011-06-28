@@ -54,13 +54,11 @@ public class Moraths_Dungeon extends Activity
 	
 	public void StartGame()
 	{
-		Maze maze = new Maze(10,10); // Do not include the outer walls in the dimensions
-		Player player = new Player(0,0,0);
+		GameRules rules = new GameRules();
 
 		Intent intent = new Intent();
 		intent.setClass(this, Game3DView.class);
-		intent.putExtra("Maze",maze);
-		intent.putExtra("Player", player);
+		intent.putExtra("rules",rules);
 		startActivity(intent);
 	}
 	

@@ -53,9 +53,20 @@ public abstract class Character implements Parcelable
 		_y = Y;
 	}
 	
+	public void moveLoc(float X, float Y)
+	{
+		_x += X;
+		_y += Y;
+	}
+	
 	public void setRot(float Rot)
 	{
 		_rot = Rot;
+	}
+	
+	public void incrementRot(float Rot)
+	{
+		_rot += Rot;
 	}
 	
 	public int describeContents() // Requred by Parcelable

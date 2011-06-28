@@ -20,7 +20,7 @@ public class Game3DView extends Activity
 	private static final int MENU_SHOW_MAP = Menu.FIRST;
 
 	private GLViewer viewer;
-	private Maze _maze;
+	private GameRules _rules; // This will be accessible to all the internal classes, too
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -28,10 +28,9 @@ public class Game3DView extends Activity
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
-		_maze = intent.getParcelableExtra("Maze");
-		Player player = intent.getParcelableExtra("Player");
+		_rules = intent.getParcelableExtra("rules");
 
-		viewer = new GLViewer(this, _maze, player);
+		viewer = new GLViewer(this);
 
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -59,7 +58,7 @@ public class Game3DView extends Activity
 		{
 			Intent intent = new Intent();
 			intent.setClass(this, MapView.class);
-			intent.putExtra("Maze", _maze);
+			intent.putExtra("Maze", _rules.getMaze());
 			startActivity(intent);
 			return true;
 		}
@@ -87,11 +86,11 @@ public class Game3DView extends Activity
 		private GameRenderer renderer;
 		private float lastX, lastY;
 
-		public GLViewer(Context context, Maze inmaze, Player player)
+		public GLViewer(Context context)
 		{
 			super(context);
 
-			renderer = new GameRenderer(inmaze, player, context, this);
+			renderer = new GameRenderer(context, this);
 			setRenderer(renderer);
 			setRenderMode(RENDERMODE_WHEN_DIRTY);
 		}
@@ -108,10 +107,10 @@ public class Game3DView extends Activity
 			{
 			case MotionEvent.ACTION_MOVE:
 				float diff = lastX - x;
-				renderer.rotate((diff / width) * 180);
+				_rules.rotatePlayer((diff / width) * 180);
 				
 				diff = lastY - y;
-				renderer.move((diff / height) * 10);
+				_rules.movePlayer((diff / height) * 10);
 				
 				requestRender();
 				break;
@@ -125,33 +124,15 @@ public class Game3DView extends Activity
 
 		private class GameRenderer implements GLSurfaceView.Renderer
 		{
-			private Context _context;
 			private GLViewer _view;
 			
-			private Maze _maze;
-			private Player _player;
-			public Axis _axis;
+			//public Axis _axis;
 
-		
-			public GameRenderer(Maze inmaze, Player player, Context context, GLViewer view)
+			public GameRenderer(Context context, GLViewer view)
 			{
-				_context = context;
 				_view = view;
 				
-				_maze = inmaze;
-				_player = player;
 				//_axis = new Axis();
-			}
-			
-			public void rotate(float angle)
-			{
-				float curangle = _player.getRot();
-				_player.setRot(curangle + angle);
-			}
-			
-			public void move(float amount)
-			{
-				_player.move(amount);
 			}
 			
 			public void onDrawFrame(GL10 gl)
@@ -164,8 +145,7 @@ public class Game3DView extends Activity
 				gl.glRotatef(180, 0, 1, 0);
 				
 				//_axis.draw(gl);
-				_player.draw(gl);
-				_maze.draw(gl);
+				_rules.draw(gl);
 				
 				gl.glPopMatrix();
 			}
