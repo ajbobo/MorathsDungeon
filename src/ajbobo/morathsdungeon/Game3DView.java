@@ -178,7 +178,7 @@ public class Game3DView extends Activity
 				// Some one-time OpenGL initialization can be made here probably based on features of this particular context
 				//gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
 				gl.glClearColor(0, 0, .25f, 1);
-				//gl.glEnable(GL10.GL_CULL_FACE);
+				gl.glEnable(GL10.GL_CULL_FACE);
 				gl.glShadeModel(GL10.GL_SMOOTH);
 				gl.glEnable(GL10.GL_DEPTH_TEST);
 			}
