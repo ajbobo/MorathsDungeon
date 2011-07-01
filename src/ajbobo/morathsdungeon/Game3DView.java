@@ -110,7 +110,7 @@ public class Game3DView extends Activity
 				_rules.rotatePlayer((diff / width) * 180);
 				
 				diff = lastY - y;
-				_rules.movePlayer((diff / height) * 10);
+				_rules.movePlayer((diff / height) * 20);
 				
 				requestRender();
 				break;
