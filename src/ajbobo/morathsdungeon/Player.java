@@ -26,7 +26,7 @@ public class Player extends Character
 	{
 		// Do not push/pop matrices here because the Player controls the view of everything else
 		gl.glRotatef(getRot(), 0f, 1f, 0f);
-		gl.glTranslatef(getX(), 0f, getY());
+		gl.glTranslatef(-getX(), 0f, getY());
 	}
 	
 	public static final Parcelable.Creator<Player> CREATOR = new Parcelable.Creator<Player>() // Requred by Parcelable
