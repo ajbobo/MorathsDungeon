@@ -8,6 +8,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.widget.Toast;
 
 public class Maze extends Drawable3D implements Parcelable
@@ -245,6 +246,16 @@ public class Maze extends Drawable3D implements Parcelable
 			return false;
 		
 		return true;
+	}
+	
+	public boolean isHallPoint(float locX, float locY)
+	{
+		// Figure out which space in the array (locX,locY) is in
+		int x = (int)Math.floor((locX + 5) / 10) + 1;
+		int y = (int)Math.floor((locY + 5) / 10) + 1;
+		
+		// Return whether or not that array space is a hall
+		return isHallSpace(x, y);
 	}
 
 	public String getMazeString()

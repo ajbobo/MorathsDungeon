@@ -106,11 +106,14 @@ public class Game3DView extends Activity
 			switch(e.getAction())
 			{
 			case MotionEvent.ACTION_MOVE:
-				float diff = lastX - x;
-				_rules.rotatePlayer((diff / width) * 180);
+				if (y > height / 2) // Ignore movement in the top half of the screen
+				{
+					float diff = lastX - x;
+					_rules.rotatePlayer((diff / width) * 180);
 				
-				diff = lastY - y;
-				_rules.movePlayer((diff / height) * 20);
+					diff = lastY - y;
+					_rules.movePlayer((diff / height) * 120);
+				}
 				
 				requestRender();
 				break;
@@ -168,7 +171,7 @@ public class Game3DView extends Activity
 				// After fighting with this command for a long time, I found these parameters that match up well
 				// with my AC3D workspace, and then I just control the view using 
 				// the scale, translate, and rotate in the draw code
-				GLU.gluLookAt(gl, 0f, 0f, -4f, 0.0f, 0.0f, 0f, 0.0f, 1.0f, 0.0f);
+				GLU.gluLookAt(gl, 0f, 0f, -1f, 0f, 0f, 0f, 0f, 1.0f, 0f);
 				
 				// By default, OpenGL enables features that improve quality but reduce performance. One might want to tweak that especially on software renderer.
 				gl.glDisable(GL10.GL_DITHER);
