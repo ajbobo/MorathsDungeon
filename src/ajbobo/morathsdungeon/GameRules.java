@@ -48,7 +48,7 @@ public class GameRules implements Parcelable
 		float newX = _player.getX() - a;
 		float newY = _player.getY() - b;
 		
-		if (_maze.isHallPoint(newX, newY))
+		if (_maze.isHallSpace(_maze.getSpace(newX), _maze.getSpace(newY)))
 			_player.setLoc(newX, newY);
 		
 		Log.i("Morath", "x: " + newX);

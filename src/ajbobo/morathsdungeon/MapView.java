@@ -23,8 +23,9 @@ public class MapView extends Activity
 		Intent intent = getIntent();
 		
 		Maze maze = intent.getParcelableExtra("Maze");
+		Player player = intent.getParcelableExtra("Player");
 		
-		viewer = new MapViewer(this, maze);
+		viewer = new MapViewer(this, maze, player);
 		
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -36,13 +37,15 @@ public class MapView extends Activity
 	private class MapViewer extends View
 	{
 		private Maze _maze;
+		private Player _player;
 		private Paint paint;
 
-		public MapViewer(Context context, Maze inmaze)
+		public MapViewer(Context context, Maze inmaze, Player inplayer)
 		{
 			super(context);
 			
 			_maze = inmaze;
+			_player = inplayer;
 			
 			paint = new Paint();
 		}

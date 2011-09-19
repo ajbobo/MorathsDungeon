@@ -59,6 +59,7 @@ public class Game3DView extends Activity
 			Intent intent = new Intent();
 			intent.setClass(this, MapView.class);
 			intent.putExtra("Maze", _rules.getMaze());
+			intent.putExtra("Player", _rules.getPlayer());
 			startActivity(intent);
 			return true;
 		}

@@ -248,6 +248,12 @@ public class Maze extends Drawable3D implements Parcelable
 		return true;
 	}
 	
+	public int getSpace(float loc)
+	{
+		return (int)Math.floor((loc + 5) / 10) + 1; // Magically, this works for X and Y
+	}
+		
+	/*
 	public boolean isHallPoint(float locX, float locY)
 	{
 		// Figure out which space in the array (locX,locY) is in
@@ -257,6 +263,7 @@ public class Maze extends Drawable3D implements Parcelable
 		// Return whether or not that array space is a hall
 		return isHallSpace(x, y);
 	}
+	*/
 
 	public String getMazeString()
 	{
